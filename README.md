@@ -180,13 +180,13 @@ Elle est moyennée sur toute l'image. **Limite** : la SSIM globale est optimiste
 
 | Masque | Pixels manquants | PSNR diffusion | PSNR TV | SSIM diffusion | SSIM TV | Temps diffusion | Temps TV |
 |---|---|---|---|---|---|---|---|
-| Rayures | … % | … dB | … dB | … | … | … s | … s |
-| Texte | … % | … dB | … dB | … | … | … s | … s |
+| Rayures | … % | 21.48 dB | 21.59 dB | 0.9866 | 0.9874| 0.03 s |4.48 s |
+| Texte | … % |  18.86 dB | 17.65 dB | 0.9830 | 0.9806| 0.01 s | 3.18  s |
 
 | Côté du trou (px) | 4 | 8 | 12 | 16 | 24 | 32 | 48 |
 |---|---|---|---|---|---|---|---|
-| PSNR diffusion (dB) | … | … | … | … | … | … | … |
-| PSNR TV (dB) | … | … | … | … | … | … | … |
+| PSNR diffusion (dB) | 14.585| 17.969|14.077 | 15.08 | 12.715 | 13.086 | 12.76 |
+| PSNR TV (dB) | 12.92 | 18.041|17.017 |14.363| 12.758 | 10.907 |10.238|
 
 **Comportements attendus :**
 - **Trous fins** (rayures, texte) : la TV restitue des contours nets là où la diffusion floute.
