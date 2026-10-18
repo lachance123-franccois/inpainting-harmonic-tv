@@ -1,0 +1,20 @@
+# Fichiers temporaires MATLAB
+*.asv
+*.m~
+*.autosave
+slprj/
+*.mex*
+
+# Gros fichiers personnels (gardez les donnees lourdes hors du depot)
+data/*.wav
+data/*.mp3
+data/*.flac
+data/*.jpg
+data/*.png
+data/songs/
+data/pano/
+!data/README.md
+
+# Systeme
+.DS_Store
+Thumbs.db
