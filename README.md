@@ -30,9 +30,9 @@ Le masque est une **donnée** du problème. Dans les expériences, on part d'une
 
 - **Gradient** (`grad_fwd`), par différences avant, avec une condition de Neumann (différence nulle sur la dernière colonne et la dernière ligne) :
 
-  ```math
-  (\nabla u)_{ij} = \big(u_{i,j+1}-u_{ij},\; u_{i+1,j}-u_{ij}\big)
-  ```
+  
+  $`(\nabla u)_{ij} = \big(u_{i,j+1}-u_{ij},\; u_{i+1,j}-u_{ij}\big)`$
+  
 
 - **Divergence** (`div_bwd`) : elle est construite comme l'adjoint exact de $`-\nabla`$, c'est-à-dire $`\langle \nabla u, p\rangle = -\langle u, \mathrm{div}\,p\rangle`$ pour tous $`u`$ et $`p`$.
 
