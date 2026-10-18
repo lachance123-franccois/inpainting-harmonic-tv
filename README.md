@@ -20,7 +20,7 @@ Reconstruction des pixels manquants d'une image (rayures, texte incrusté, objet
 
 **Problème.** On cherche l'image la plus régulière qui respecte cette contrainte :
 
-$$\min_{u}\; R(u) \quad \text{sous} \quad u = f \text{ sur } \Omega^c$$
+$\min_{u}\; R(u) \quad \text{sous} \quad u = f \text{ sur } \Omega^c$
 
 Le masque est une **donnée** du problème. Dans les expériences, on part d'une image intacte et on fabrique le masque, ce qui permet de mesurer l'erreur par rapport à la vérité terrain.
 
@@ -28,7 +28,7 @@ Le masque est une **donnée** du problème. Dans les expériences, on part d'une
 
 - **Gradient** (`grad_fwd`), par différences avant, avec une condition de Neumann (différence nulle sur la dernière colonne et la dernière ligne) :
 
-  $$(\nabla u)_{ij} = \big(u_{i,j+1}-u_{ij},\; u_{i+1,j}-u_{ij}\big)$$
+  $(\nabla u)_{ij} = \big(u_{i,j+1}-u_{ij},\; u_{i+1,j}-u_{ij}\big)$
 
 - **Divergence** (`div_bwd`) : elle est construite comme l'adjoint exact de $-\nabla$, c'est-à-dire $\langle \nabla u, p\rangle = -\langle u, \operatorname{div} p\rangle$ pour tous $u$ et $p$.
 
@@ -171,6 +171,10 @@ Elle est moyennée sur toute l'image. **Limite** : la SSIM globale est optimiste
 
 ## 6. Lancer le projet
 
+```matlab
+>> cd chemin/vers/inpainting-harmonic-tv
+>> main
+```
 
 - MATLAB R2021a ou plus récent, sans aucune toolbox.
 - **Image de test** : `cameraman.tif` ou `peppers.png` si elles sont disponibles, sinon une image synthétique. L'image est recadrée au centre puis rééchantillonnée en 256 × 256.
