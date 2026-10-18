@@ -8,6 +8,7 @@ Reconstruction des pixels manquants d'une image (rayures, texte incrusté, objet
 | Variation totale | Descente de gradient sur une TV lissée ; Chambolle-Pock |
 
 ![Rayures](results/fig1_rayures.png)
+![Rayures](results/fig2_texte.png)
 
 ## 1. Problème
 
