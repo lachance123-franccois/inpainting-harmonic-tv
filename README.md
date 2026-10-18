@@ -89,7 +89,7 @@ TV(u) = \sum_{ij} |\nabla u_{ij}| = \sum_{ij}\sqrt{(u_x)_{ij}^2 + (u_y)_{ij}^2}
 | Critère | Coût du saut | Conséquence |
 |---|---|---|
 | Harmonique | $`h^2/n`$ | Diminue quand on étale : la solution floute le contour. |
-| TV | $`h`$ | Indépendant de $`n`$ : un bord franc ne coûte pas plus qu'une rampe. |
+| TV | $`h`$ | Indépendant de $`n`$ : un bord franc . |
 
 **Interprétation géométrique.** La TV est égale à la somme des longueurs des lignes de niveau (formule de la coaire). À l'optimum, $`\mathrm{div}(\nabla u/|\nabla u|) = 0`$ dans $`\Omega`$, ce qui signifie que la courbure des lignes de niveau est nulle. Les contours sont donc **prolongés en ligne droite**.
 
