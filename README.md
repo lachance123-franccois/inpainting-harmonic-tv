@@ -75,7 +75,7 @@ u^{k+1} = u^k + dt\,\Delta u^k \quad \text{dans } \Omega
 - **Convergence** : l'erreur vérifie $`e^{k+1} = (I - dt\,A)\,e^k`$. Comme $`\lambda(A) \in \,]0, 8]`$, il y a convergence pour $`dt < 1/4`$. Le code prend $`dt = 0{,}24`$.
 - **Arrêt** : la boucle s'arrête quand $`\max_\Omega |b - Ax| < 10^{-4}`$, avec `nIter` comme garde-fou.
 - **Coût** : pour un trou de côté $`L`$, $`\lambda_{\min} \approx 2\pi^2/L^2`$. Il faut donc environ $`1{,}5\,L^2`$ itérations pour diviser l'erreur par 1000. La méthode explicite devient inutilisable pour les grands trous.
-- **Suivi de l'énergie** : à chaque itération, on enregistre $`E(u^k) = \sum|\nabla u^k|^2`$. Comme $`E(u) - E(u^*) = (x - x^*)^\top A\,(x - x^*)`$, cette quantité mesure l'erreur par rapport à la solution directe (figure 5).
+- **Suivi de l'énergie** : à chaque itération, on enregistre $`E(u^k) = \sum|\nabla u^k|^2`$. Comme $`E(u) - E(u^*) = (x - x^*)^\top A\,(x - x^*)`$, cette quantité mesure l'erreur par rapport à la solution directe (figure 4).
 
 ## 3. Variation totale
 
@@ -169,30 +169,69 @@ Elle est moyennée sur toute l'image. **Limite** : la SSIM globale est optimiste
 
 ## 5. Expériences et résultats
 
+Image de test 256 × 256, `rng(1)`. Les 4 méthodes sont appliquées aux mêmes masques.
+
+| Méthode | Arrêt | Maximum d'itérations |
+|---|---|---|
+| Diffusion directe | une seule résolution, pas d'itérations | – |
+| Diffusion explicite | $`\max_\Omega \|\Delta u\| < 10^{-4}`$ | 20 000 |
+| TV, descente de gradient ($`\varepsilon = 0{,}05`$) | nombre fixe d'itérations | 3 000 |
+| TV, Chambolle-Pock | $`r_1 < 10^{-4}`$ et $`r_2 < 10^{-4}`$ | 5 000 |
+
+Les temps sont mesurés après un appel de chauffe (compilation JIT exclue). Pour les méthodes de moins de 0,5 s, on garde la médiane de 5 exécutions. Les temps de la TV incluent l'initialisation par la solution harmonique directe.
+
 | Figure | Contenu |
 |---|---|
-| `fig1_rayures.png` | 14 rayures aléatoires (demi-épaisseur 1 à 3 px) : original, dégradé, diffusion, TV |
+| `fig1_rayures.png` | 14 rayures aléatoires (demi-épaisseur 1 à 3 px) : original, dégradé et les 4 reconstructions |
 | `fig2_texte.png` | Texte « MATLAB » incrusté |
-| `fig4_psnr_vs_taille.png` | PSNR dans le trou en fonction du côté d'un trou carré (4 à 48 px) |
-| `fig5_convergence.png` | À gauche, $`E(u_k) - E(u^*)`$ pour la diffusion explicite (échelle log). À droite, $`TV(u_k)`$ pour la descente de gradient ($`\varepsilon = 0{,}02`$) et pour Chambolle-Pock. |
-| `fig6_photo.png` | Suppression d'un objet sur une photo personnelle (optionnel) |
+| `fig3_taille_trou.png` | PSNR et temps de calcul des 4 méthodes en fonction du côté d'un trou carré (4 à 48 px) |
+| `fig4_convergence.png` | À gauche, $`E(u_k) - E(u^*)`$ pour la diffusion explicite (échelle log). À droite, $`TV(u_k)`$ pour la descente de gradient et pour Chambolle-Pock. |
+| `fig5_photo.png` | Suppression d'un objet sur une photo personnelle (optionnel) |
 
-**Résultats** (image 256 × 256, `rng(1)`), à compléter avec la sortie de `main` :
+### Rayures et texte
 
-| Masque | Pixels manquants | PSNR diffusion | PSNR TV | SSIM diffusion | SSIM TV | Temps diffusion | Temps TV |
-|---|---|---|---|---|---|---|---|
-| Rayures | … % | 21.48 dB | 21.59 dB | 0.9866 | 0.9874| 0.03 s |4.48 s |
-| Texte | … % |  18.86 dB | 17.65 dB | 0.9830 | 0.9806| 0.01 s | 3.18  s |
+| Masque | Méthode | PSNR (dB) | SSIM | Temps (s) | Itérations | ms / itération |
+|---|---|---|---|---|---|---|
+| Rayures (7,4 %) | Diffusion directe | **22.19** | 0.9793 | **0.010** | – | – |
+| | Diffusion explicite | 22.18 | 0.9793 | 0.63 | 253 | 2.48 |
+| | TV gradient | 21.90 | 0.9791 | 8.26 | 3 000 | 2.75 |
+| | TV Chambolle-Pock | 20.68 | 0.9762 | 9.69 | 5 000 (max) | 1.94 |
+| Texte (5,6 %) | Diffusion directe | **18.86** | 0.9830 | **0.008** | – | – |
+| | Diffusion explicite | 18.86 | 0.9830 | 0.41 | 166 | 2.45 |
+| | TV gradient | 18.44 | 0.9824 | 8.04 | 3 000 | 2.68 |
+| | TV Chambolle-Pock | 17.66 | 0.9807 | 8.32 | 5 000 (max) | 1.66 |
+
+### Trou carré de taille croissante
 
 | Côté du trou (px) | 4 | 8 | 12 | 16 | 24 | 32 | 48 |
 |---|---|---|---|---|---|---|---|
-| PSNR diffusion (dB) | 14.585| 17.969|14.077 | 15.08 | 12.715 | 13.086 | 12.76 |
-| PSNR TV (dB) | 12.92 | 18.041|17.017 |14.363| 12.758 | 10.907 |10.238|
+| PSNR diffusion directe (dB) | **14.59** | 17.97 | 14.08 | 15.08 | 12.72 | **13.09** | 12.76 |
+| PSNR diffusion explicite (dB) | **14.59** | 17.97 | 14.07 | 15.06 | 12.69 | 13.07 | 12.73 |
+| PSNR TV gradient (dB) | 13.58 | 17.66 | 16.74 | **16.34** | **12.92** | 13.03 | **12.79** |
+| PSNR TV Chambolle-Pock (dB) | 12.92 | **18.04** | **17.02** | 14.36 | 12.76 | 10.91 | 10.33 |
+| Temps diffusion directe (s) | 0.0016 | 0.0014 | 0.0027 | 0.0024 | 0.0023 | 0.0047 | 0.0067 |
+| Temps diffusion explicite (s) | 0.086 | 0.22 | 0.46 | 0.62 | 1.29 | 2.36 | 3.42 |
+| Temps TV gradient (s) | 7.03 | 7.20 | 7.07 | 7.20 | 8.51 | 7.60 | 7.48 |
+| Temps TV Chambolle-Pock (s) | 2.66 | 2.80 | 3.32 | 2.62 | 4.48 | 5.57 | 6.73 |
+| Itérations diffusion explicite | 42 | 120 | 212 | 327 | 598 | 942 | 1 658 |
+| Itérations TV gradient | 3 000 | 3 000 | 3 000 | 3 000 | 3 000 | 3 000 | 3 000 |
+| Itérations TV Chambolle-Pock | 5 000 | 5 000 | 5 000 | 5 000 | 5 000 | 5 000 | 5 000 |
 
-**Comportements attendus :**
-- **Trous fins** (rayures, texte) : la TV restitue des contours nets là où la diffusion floute.
-- **Trous larges** : les deux méthodes se dégradent. La TV produit des aplats, et peut couper un contour plutôt que de le prolonger sur une grande distance.
-- **Textures** : aucune des deux méthodes ne les reconstruit.
+### Analyse : vitesse
+
+- **La diffusion directe est de loin la plus rapide** : 1 à 10 ms, soit 50 fois moins que le schéma explicite et 800 à 4 000 fois moins que les méthodes TV. Elle ne fait qu'une résolution creuse, sur les seuls pixels inconnus. Son temps n'augmente que faiblement avec la taille du trou (de 16 à 2 304 inconnues).
+- **Le schéma explicite converge bien vers la solution directe** : même PSNR à 0,03 dB près. Mais il travaille sur l'image entière, à un coût constant d'environ 2,5 ms par itération, et son nombre d'itérations croît avec la largeur $`L`$ du trou : de 42 ($`L = 4`$) à 1 658 ($`L = 48`$), soit environ $`L^{1,5}`$ sur cette plage. Son temps passe ainsi de 0,09 à 3,4 s. Sur des trous fins (rayures, texte), 166 à 253 itérations suffisent.
+- **La descente de gradient fait toujours 3 000 itérations**, car elle n'a pas de critère d'arrêt. Son temps est donc presque constant (7 à 8,5 s), quelle que soit la taille du trou.
+- **Chambolle-Pock n'a jamais atteint son critère** $`r_1, r_2 < 10^{-4}`$ : il s'arrête à chaque fois sur le maximum de 5 000 itérations. Son temps reflète ce plafond, pas une convergence. Son coût par itération (1,7 à 1,9 ms sur les rayures et le texte) est inférieur à celui de la descente de gradient. À nombre d'itérations égal, son temps varie pourtant de 2,6 à 6,7 s selon la taille du trou : ces écarts ne s'expliquent pas par l'algorithme (le coût d'une itération ne dépend pas de la taille du trou) et relèvent probablement de la variabilité de la machine, avec une seule mesure par point.
+- **Le temps des méthodes TV est donc fixé par leur règle d'arrêt** : un nombre fixe d'itérations pour la descente de gradient, un critère trop strict pour Chambolle-Pock. Assouplir la tolérance de Chambolle-Pock ou limiter les calculs au rectangle englobant du trou réduirait fortement ces temps.
+
+### Analyse : qualité
+
+- **Sur les rayures et le texte, la diffusion est la meilleure** (22,19 dB et 18,86 dB). Le PSNR baisse à mesure que la méthode se rapproche de la vraie TV : la descente de gradient, dont la TV lissée ($`\varepsilon = 0{,}05`$) se comporte encore comme une diffusion dans les zones peu contrastées, est intermédiaire ; Chambolle-Pock, qui minimise la vraie TV, est le plus bas. Sur une image naturelle avec des dégradés, les aplats de la TV coûtent plus que ce qu'apportent ses contours nets.
+- **Sur les trous carrés de 12 et 16 px, la TV l'emporte** : +2,9 dB à 12 px (Chambolle-Pock) et +1,3 dB à 16 px (descente de gradient). Ces trous coupent des contours que la TV prolonge. À 8 px, l'avantage de Chambolle-Pock est négligeable (+0,07 dB).
+- **Sur les grands trous (32 et 48 px), Chambolle-Pock se dégrade nettement** (10,3 à 10,9 dB, contre environ 13 dB pour les autres) : la TV remplit la zone d'aplats.
+- **Le PSNR ne décroît pas régulièrement avec la taille du trou** (par exemple 17,97 dB à 8 px contre 14,59 dB à 4 px pour la diffusion) : chaque carré, centré, recouvre un contenu différent de l'image, et la difficulté dépend autant de ce contenu que de la taille.
+- **La SSIM varie très peu** (0,976 à 0,983), car elle est calculée sur toute l'image, dont plus de 92 % des pixels sont identiques à l'original.
 
 ## 6. Lancer le projet
 
